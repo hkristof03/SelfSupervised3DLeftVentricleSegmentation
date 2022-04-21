@@ -40,6 +40,8 @@ class Visualizer:
                 axes[i].imshow(self.montage_nrrd(data))
                 axes[i].set_axis_off()
 
+        return fig
+
 
 def get_subjects(file_spect_data, folder_volumes):
 
@@ -141,3 +143,44 @@ def replace_target_norm_layer_for_group_norm(
                 desired,
                 num_groups
             )
+
+
+def get_annotated_subjects(file_spect_data, folder_volumes):
+    """
+
+    :param file_spect_data:
+    :param folder_volumes:
+    :return:
+    """
+    path_data = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        'data'
+    )
+    path_volumes = os.path.join(path_data, folder_volumes)
+
+    df = pd.read_csv(os.path.join(path_data, 'eda', file_spect_data))
+    subjects = []
+
+    segmentations = list(
+        df.loc[
+            (df['mask'].notnull()),
+            ['image', 'mask']
+        ].to_records(index=False)
+    )
+    segmentations = list(map(
+        lambda x: (
+            os.path.join(path_volumes, x[0]),
+            os.path.join(path_volumes, x[1])
+        ),
+        segmentations
+    ))
+    for image_path, label_path in segmentations:
+        subject = tio.Subject(
+            spect=tio.ScalarImage(image_path, reader=load_image),
+            left_ventricle=tio.LabelMap(label_path, reader=load_image)
+        )
+        subjects.append(subject)
+
+    print(f"There are {len(subjects)} annotated subjects")
+
+    return subjects

@@ -1,0 +1,46 @@
+seed: 2022
+
+experiment_name: jps_perm_1000_inst_norm_aug_drop_target_task
+file_spect_data: spect_data.csv
+folder_volumes: segmentation_xyz
+training_split_ratio: 0.6
+
+augmentation_pipeline:
+  target_shape: !!python/tuple [128, 128, 32]
+  max_displacement: !!python/tuple [8, 8, 0]
+  num_control_points: 10
+
+model:
+  UNet:
+    num_encoding_blocks: 3
+    out_channels_first_layer: 8
+    normalization: instance
+    dropout: 0.5
+
+  pretrained: True
+  experiment_name: jps_perm_1000_inst_norm_aug_drop
+
+optimizer:
+  learning_rate: 0.001
+
+data_loader:
+  batch_size: 2
+  num_workers: 1
+
+train:
+  num_epochs: 5
+  early_stop: 100
+
+criterion: 'dice'
+scheduler:
+  name: 'ExponentialLR'
+  params:
+    gamma: 0.99
+
+neptune:
+  project: Masters-thesis
+  api_token: eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiIwZGExNjY4NS1mZjA4LTQ1ZGQtYjM0Yi1jZWJiN2IxOTgzY2YifQ==
+  tags:
+    - supervised
+    - target_task
+    - test

@@ -1,0 +1,53 @@
+seed: 2022
+
+experiment_name: rlp_instance_norm_aug_rf32_dropout1
+file_spect_data: spect_data.csv
+folder_volumes: segmentation_xyz_cropped
+training_split_ratio: 0.85
+
+augmentation_pipeline:
+  target_shape: !!python/tuple [128, 128, 32]
+  max_displacement: !!python/tuple [8, 8, 0]
+  num_control_points: 10
+  patch_dim: 28
+  gap: 14
+
+model:
+  patch_dim_x: 28
+  patch_dim_z: 32
+  num_encoding_blocks: 3
+  out_channels_first_layer: 8
+  normalization: instance
+  reduction_factor: 32
+  dropout: 0.5
+  n_patches: 2
+
+optimizer:
+  learning_rate: 0.0001
+
+data_loader:
+  batch_size: 8
+  num_workers: 2
+
+train:
+  num_epochs: 500
+  early_stop: 50
+
+# Unet package does not support direct specification of GroupNorm Layer
+# use normalization: instance in the config file to replace InstanceNorm3d
+# layers for GroupNorm layers
+group_norm:
+  replace: False
+  groups: 2
+
+neptune:
+  project: Masters-thesis
+  api_token: eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiIwZGExNjY4NS1mZjA4LTQ1ZGQtYjM0Yi1jZWJiN2IxOTgzY2YifQ==
+  tags:
+    - ssl
+    - relative_patch_location
+    - instance_norm
+    - rf_32
+    - dropout
+
+

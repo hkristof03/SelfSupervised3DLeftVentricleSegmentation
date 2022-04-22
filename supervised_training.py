@@ -228,7 +228,7 @@ def train(
             device, Action.VALIDATE, validation_loader, model,
             criterion, optimizer, scheduler
         ))
-        vl_iou = valid_stats[-1][-2]
+        vl_iou = valid_stats[-1][-1]
 
         if vl_iou > best_val_iou:
             print(f'Saving model at epoch: {epoch_idx}')
@@ -417,7 +417,7 @@ def run_experiment(conf, path_conf):
     nl.log_artifacts([
         path_save, path_df_tr, path_conf
     ])
-    """
+
     vis = Visualizer()
     model.eval()
     pred_counter = 0
@@ -437,14 +437,13 @@ def run_experiment(conf, path_conf):
                 3, 0, 1, 2
             )
             pred = probabilities[i].permute(3, 0, 1, 2)
-            fig = vis.visualize(
+            vis.visualize(
                 np.squeeze(label.permute(1, 0, 2, 3).numpy(), axis=0),
                 np.squeeze(pred.permute(1, 0, 2, 3).numpy(), axis=0),
+                os.path.join(
+                    path_artifacts, f'mask_predictions_{pred_counter}.png'
+                )
             )
-            plt.savefig(os.path.join(
-                path_artifacts, 'mask_predictions.png'
-            ))
-            plt.close()
 
             affine = batch['spect'][tio.AFFINE][i].numpy()
             subject = tio.Subject(
@@ -458,13 +457,16 @@ def run_experiment(conf, path_conf):
                     tensor=probabilities[i], affine=affine
                 )
             )
-            subject.plot(figsize=(9, 8), cmap_dict={'predicted': 'RdBu_r'})
-            plt.savefig(os.path.join(
+            output_path = os.path.join(
                 path_artifacts, f'predictions_planes_view_{pred_counter}.png'
-            ))
-            plt.close()
+            )
+            subject.plot(
+                figsize=(9, 8),
+                cmap_dict={'predicted': 'RdBu_r'},
+                show=False,
+                output_path=output_path
+            )
             pred_counter += 1
-    """
 
 
 if __name__ == '__main__':

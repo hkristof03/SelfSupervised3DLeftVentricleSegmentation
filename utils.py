@@ -27,7 +27,7 @@ class Visualizer:
             warnings.warn('Pass a 3D volume', RuntimeWarning)
             return image
 
-    def visualize(self, image, mask=None):
+    def visualize(self, image, mask=None, path_save=None):
 
         if mask is None:
             fig, axes = plt.subplots(1, 1, figsize=(10, 10))
@@ -39,8 +39,8 @@ class Visualizer:
             for i, data in enumerate([image, mask]):
                 axes[i].imshow(self.montage_nrrd(data))
                 axes[i].set_axis_off()
-
-        return fig
+                plt.savefig(path_save)
+            plt.close(fig)
 
 
 def get_subjects(file_spect_data, folder_volumes):

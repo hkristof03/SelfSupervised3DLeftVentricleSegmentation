@@ -105,8 +105,8 @@ class UnetEncoderSSLJPS(nn.Module):
             dropout=dropout
         ).encoder
 
-        dx = patch_dim_x // 2 ** (num_encoding_blocks - 1)
-        dz = patch_dim_z // 2 ** (num_encoding_blocks - 1)
+        dx = patch_dim_x // 2**(num_encoding_blocks - 1)
+        dz = patch_dim_z // 2**(num_encoding_blocks - 1)
         n_in = num_encoding_blocks * out_channels_first_layer * 2 * dx**2 * dz
         n_out = n_in // reduction_factor
 

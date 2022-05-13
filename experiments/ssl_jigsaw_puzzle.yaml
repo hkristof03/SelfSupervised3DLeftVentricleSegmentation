@@ -1,6 +1,6 @@
 seed: 2022
 
-experiment_name: jps_more_encoding_blocks_dropout1
+experiment_name: jps_more_encoding_blocks_dropout3
 file_spect_data: spect_data.csv
 folder_volumes: segmentation_xyz_cropped
 training_split_ratio: 0.85
@@ -17,9 +17,9 @@ model:
   patch_dim_x: 28
   patch_dim_z: 32
   num_encoding_blocks: 4
-  out_channels_first_layer: 16
+  out_channels_first_layer: 64
   normalization: instance
-  reduction_factor: 8
+  reduction_factor: 32
   dropout: 0.5
   n_patches: 9
   n_permutations: 1000
@@ -28,7 +28,7 @@ optimizer:
   learning_rate: 0.001
 
 data_loader:
-  batch_size: 4
+  batch_size: 8
   num_workers: 2
 
 train:
@@ -50,7 +50,7 @@ neptune:
     - jigsaw_puzzle
     - instance_norm
     - perm_1000
-    - rf_8
-    - out_channels_16
+    - rf_32
+    - out_channels_64
     - encoding_blocks_4
     - dropout

@@ -1,11 +1,9 @@
 import os
 import random
-import multiprocessing
 import time
 
 import yaml
 import enum
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from tqdm.notebook import tqdm
@@ -173,12 +171,13 @@ def get_model_and_optimizer(config, device):
 
 def get_criterion(conf):
 
-    criterion = conf['criterion']
+    criterion = conf['criterion']['name']
 
     if criterion == 'dice':
         return get_dice_loss
     elif criterion == 'focal':
-        return sigmoid_focal_loss
+        gamma = conf['criterion']['gamma']
+        return lambda *args: sigmoid_focal_loss(*args, gamma=gamma)
     elif criterion == 'logcosh':
         return get_log_cosh_dice_loss
     else:
@@ -388,8 +387,10 @@ def run_experiment(conf, path_conf):
         }
         model.encoder.load_state_dict(encoder_weights)
 
+        blocks_to_freeze = conf['model']['blocks_to_freeze']
+
         for name, param in model.named_parameters():
-            if name.startswith('encoder'):
+            if any([''.join(['encoding_', x]) in name for x in blocks_to_freeze]):
                 param.requires_grad = False
             else:
                 param.requires_grad = True
@@ -419,6 +420,8 @@ def run_experiment(conf, path_conf):
     ])
 
     vis = Visualizer()
+    best_weights = torch.load(path_save)['weights']
+    model.load_state_dict(best_weights)
     model.eval()
     pred_counter = 0
 

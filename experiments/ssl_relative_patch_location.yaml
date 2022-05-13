@@ -1,6 +1,6 @@
 seed: 2022
 
-experiment_name: rlp_instance_norm_aug_rf32_dropout1
+experiment_name: rlp_num_blocks_4_out_chs_64_3
 file_spect_data: spect_data.csv
 folder_volumes: segmentation_xyz_cropped
 training_split_ratio: 0.85
@@ -15,15 +15,15 @@ augmentation_pipeline:
 model:
   patch_dim_x: 28
   patch_dim_z: 32
-  num_encoding_blocks: 3
-  out_channels_first_layer: 8
+  num_encoding_blocks: 4
+  out_channels_first_layer: 16
   normalization: instance
-  reduction_factor: 32
-  dropout: 0.5
+  reduction_factor: 8
+  dropout: 0.25
   n_patches: 2
 
 optimizer:
-  learning_rate: 0.0001
+  learning_rate: 0.001
 
 data_loader:
   batch_size: 8
@@ -47,7 +47,10 @@ neptune:
     - ssl
     - relative_patch_location
     - instance_norm
-    - rf_32
-    - dropout
+    - encoding_blocks_4
+    - out_channels_16
+    - rf_8
+    - dropout_0.25
+    - lr_0.001
 
 

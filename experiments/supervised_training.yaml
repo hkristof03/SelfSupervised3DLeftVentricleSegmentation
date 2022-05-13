@@ -1,6 +1,6 @@
 seed: 2022
 
-experiment_name: jps_perm_1000_inst_norm_aug_drop_target_task
+experiment_name: jps_focal_loss_4
 file_spect_data: spect_data.csv
 folder_volumes: segmentation_xyz
 training_split_ratio: 0.6
@@ -12,13 +12,17 @@ augmentation_pipeline:
 
 model:
   UNet:
-    num_encoding_blocks: 3
-    out_channels_first_layer: 8
+    num_encoding_blocks: 4
+    out_channels_first_layer: 64
     normalization: instance
-    dropout: 0.5
+    dropout: 0.25
 
   pretrained: True
-  experiment_name: jps_perm_1000_inst_norm_aug_drop
+  experiment_name: jps_more_encoding_blocks_dropout2
+  blocks_to_freeze:
+    - blocks.0
+    - blocks.1
+    - blocks.2
 
 optimizer:
   learning_rate: 0.001
@@ -28,10 +32,13 @@ data_loader:
   num_workers: 1
 
 train:
-  num_epochs: 5
+  num_epochs: 500
   early_stop: 100
 
-criterion: 'dice'
+criterion:
+  name: 'focal'
+  gamma: 1.0         # used only when name='focal'
+
 scheduler:
   name: 'ExponentialLR'
   params:
@@ -43,4 +50,9 @@ neptune:
   tags:
     - supervised
     - target_task
-    - test
+    - encoding_blocks_4
+    - out_channels_64
+    - dropout_0.25
+    - jigsaw_puzzle_pretext
+    - focal_loss
+    - gamma_1.0
